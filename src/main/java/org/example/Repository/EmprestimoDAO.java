@@ -29,5 +29,23 @@ public class EmprestimoDAO {
         }
     }
 
+    public void devolucaoLivro(Emprestimo emprestimo) throws SQLException {
+
+        String query = """
+                UPDATE emprestimos
+                SET data_devolucao = ?
+                WHERE id = ?
+                """;
+
+        try (Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setDate(1, emprestimo.getDataDevolucao());
+            stmt.setInt(2,emprestimo.getId());
+            stmt.executeUpdate();
+        }
+    }
+
+    // Busca de emprstimo por ID
 
 }

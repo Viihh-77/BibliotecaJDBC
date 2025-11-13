@@ -5,6 +5,7 @@ import org.example.Util.Conexao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class LivroDAO {
@@ -31,7 +32,7 @@ public class LivroDAO {
     public void livroDisponivel(int idLivro, boolean disponivel) throws SQLException {
         String query = """
                 UPDATE livros
-                SET disponibilidade = ?
+                SET disponivel = ?
                 WHERE id = ?
                 """;
 
@@ -41,8 +42,28 @@ public class LivroDAO {
             stmt.setBoolean(1, disponivel);
             stmt.setInt(2, idLivro);
             stmt.executeUpdate();
-
         }
+    }
+
+    public boolean verificaDuplicidade(Livro livro) throws SQLException {
+
+        String query = """
+                SELECT COUNT(*) AS linhas
+                FROM livros
+                WHERE titulo = ?
+                """;
+
+        try (Connection conn = Conexao.conectar();
+        PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, livro.getTitulo());
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next() && rs.getInt("linhas") > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
